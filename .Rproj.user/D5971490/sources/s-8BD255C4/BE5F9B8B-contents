@@ -1,0 +1,143 @@
+---
+title: "Carte Golfe du St Laurent & St Pierre et Miquelon"
+author: "A. Boyé"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = TRUE, eval = TRUE, cache = TRUE)
+```
+
+---
+
+# Packages {.tabset}
+
+```{r packages}
+library(ggplot2)
+library(PBSmapping) 
+library(data.table)
+library(rgdal)
+library(raster)
+```
+
+# Carte du monde centré sur le canada
+
+```{r world_map}
+world <- map_data("world")
+
+worldmap <- ggplot(world, aes(x=long, y=lat, group=group)) 
+worldmap <- worldmap + geom_path()
+worldmap <- worldmap + scale_y_continuous(breaks=(-2:2) * 30) 
+worldmap <- worldmap + scale_x_continuous(breaks=(-4:4) * 45)
+worldmap <- worldmap + coord_map("ortho", orientation=c(44, -100, 0)) + ylab("") + xlab("")
+worldmap <- worldmap + geom_polygon(data=world, mapping=aes(x=long, y=lat,group=group),col="gray45") 
+worldmap <- worldmap + theme_light() + theme(axis.text=element_blank(),axis.ticks=element_blank(),panel.border=element_blank())
+
+worldmap
+```
+
+---
+
+# Carte zoomée sur Golfe du Saint Laurent 
+
+```{r st_laurent}
+world <- map_data("world")
+
+setnames(world,c("X","Y","PID","POS","region","subregion"))
+
+xlim <- c(-70,-40)
+ylim <- c(40,60)
+
+worldmap <- clipPolys(world, xlim=xlim,ylim=ylim, keepExtra=TRUE)
+
+p <- ggplot() 
+p <- p + coord_map(xlim=xlim,ylim=ylim) 
+p <- p + geom_polygon(data=worldmap,aes(X,Y,group=PID))
+p <- p + theme_bw() + theme(panel.background = element_rect(fill = "aliceblue", colour = "grey"),panel.grid.major = element_line(colour = "gray90",size=.7),panel.border=element_blank())
+
+p
+```
+
+---
+
+# Carte zoomée sur St Pierre
+
+## Version `maps`
+
+```{r st_pierre_maps}
+
+world <- map_data("world")
+
+setnames(world,c("X","Y","PID","POS","region","subregion"))
+
+xlim <- c(-56.5,-55.5)
+ylim <- c(46.5,47.3)
+
+worldmap <- clipPolys(world, xlim=xlim,ylim=ylim, keepExtra=TRUE)
+
+
+p <- ggplot() 
+p <- p + coord_map(xlim=xlim,ylim=ylim) 
+p <- p + geom_polygon(data=worldmap,aes(X,Y,group=PID))
+p <- p + theme_bw() + theme(panel.background = element_rect(fill = "aliceblue", colour = "grey"),panel.grid.major = element_line(colour = "gray90",size=.7),panel.border=element_blank())
+
+p
+```
+
+## Version `Openstreetmap`
+
+`land_polygons` was downloaded from openstreetmapdata.com which offers
+extracts and processings of OpenStreetMap data. 
+
+See http://openstreetmapdata.com/ for details.
+
+Layers contained are:
+
+land_polygons.shp:
+
+  598199 Polygon features
+  WGS84 geographic coordinates
+  Extent: (-180.000, -90.000) - (180.000, 83.666)
+
+Date of the data used is 28 Oct 2017 04:45
+
+You can find more information on this data set at
+
+http://openstreetmapdata.com/data/land-polygons
+
+> ### LICENSE
+> This data is Copyright 2017 OpenStreetMap contributors. It is
+available under the Open Database License (ODbL).
+>
+> For more information see http://www.openstreetmap.org/copyright
+
+
+```{r st_pierre_openstreetmap, message = FALSE}
+
+# Read land_polygons.shp from the current working directory (".")
+poly_layer <- readOGR(dsn=".",layer = "land_polygons")
+
+# Crop the layer to the desired extent
+poly_layer_cropped <- crop(poly_layer,extent(-56.5,-55.5,46.5,47.3))
+
+# Project the layer in WGS84 
+poly_proj <- spTransform(poly_layer_cropped, CRS("+init=epsg:4326"))
+
+p <- ggplot() 
+p <- p + geom_polygon(data=poly_proj,aes(long,lat,group=id),col="gray45") 
+p <- p + theme_bw() + theme(panel.background = element_rect(fill = "aliceblue", colour = "grey"),panel.grid.major = element_line(colour = "gray90",size=.7),panel.border=element_blank())
+p
+
+```
+
+---
+
+# Session info
+
+```{r session_info}
+sessionInfo()
+```

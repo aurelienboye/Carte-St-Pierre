@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1554380274423.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3056699940",
+    "id" : "E701C30C",
+    "lastKnownWriteTime" : 1554381459,
+    "last_content_update" : 1554381459580,
+    "path" : "~/Documents/Boulot/Chunk_code/Cartographie/Map_st_pierre/README.Rmd",
+    "project_path" : "README.Rmd",
+    "properties" : {
+        "chunk_output_type" : "console",
+        "cursorPosition" : "141,32",
+        "scrollLine" : "120"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_markdown"
+}

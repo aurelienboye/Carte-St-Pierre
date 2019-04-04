@@ -1,0 +1,8 @@
+base
+ggplot2
+PBSmapping
+data.table
+sp
+rgdal
+raster
+maps
